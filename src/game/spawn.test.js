@@ -40,6 +40,10 @@ describe('word spawning', () => {
     expect(getWordSpeed('casa', 60)).toBeGreaterThan(getWordSpeed('extraordinario', 60));
   });
 
+  it('heavily slows oversized words so they remain readable', () => {
+    expect(getWordSpeed('interplanetario', 205)).toBeLessThanOrEqual(70);
+  });
+
   it('assigns different font variants to spawned words', () => {
     const firstEnemy = createWordEnemy({
       level,

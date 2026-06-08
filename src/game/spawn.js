@@ -48,7 +48,9 @@ export function getSpawnPoint(arena, radialAngle) {
 
 export function getWordSpeed(word, baseSpeed) {
   const complexity = getWordComplexity(word);
-  return Math.max(28, baseSpeed - complexity * 9 - Math.max(0, word.length - 10) * 0.8);
+  const longWordPenalty = Math.max(0, word.length - 5) * 16;
+  const oversizedPenalty = Math.max(0, word.length - 10) * 9;
+  return Math.max(42, baseSpeed - complexity * 14 - longWordPenalty - oversizedPenalty);
 }
 
 function chooseWordFontFamily(rng) {
