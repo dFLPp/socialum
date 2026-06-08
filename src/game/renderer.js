@@ -21,20 +21,17 @@ function drawCoverImage(ctx, image, width, height) {
 }
 
 function drawFallbackBackground(ctx, level, width, height) {
-  const gradient = ctx.createRadialGradient(width / 2, height / 2, 40, width / 2, height / 2, Math.max(width, height));
-  gradient.addColorStop(0, level.id === 3 ? '#111014' : '#0d0d0d');
-  gradient.addColorStop(1, '#030303');
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = '#f5f1e8';
   ctx.fillRect(0, 0, width, height);
 
   ctx.save();
-  ctx.globalAlpha = 0.045;
-  ctx.strokeStyle = '#ffffff';
+  ctx.globalAlpha = 0.24;
+  ctx.strokeStyle = '#d9d1c2';
   ctx.lineWidth = 1;
-  for (let y = 36; y < height; y += 128) {
+  for (let y = 64 + level.id * 8; y < height; y += 128) {
     ctx.beginPath();
-    ctx.moveTo(0, y + level.id * 4);
-    ctx.lineTo(width, y - 10);
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
     ctx.stroke();
   }
   ctx.restore();
@@ -48,18 +45,18 @@ function drawPlayer(ctx, state, playerImage, now) {
   );
 
   ctx.save();
-  ctx.shadowColor = damaged ? 'rgba(255, 90, 90, 0.48)' : 'rgba(88, 169, 255, 0.25)';
-  ctx.shadowBlur = damaged ? 26 : 18;
+  ctx.shadowColor = damaged ? 'rgba(200, 63, 63, 0.22)' : 'transparent';
+  ctx.shadowBlur = damaged ? 20 : 0;
 
   if (playerImage) {
     ctx.drawImage(playerImage, x - radius, y - radius, radius * 2, radius * 2);
   } else {
-    ctx.fillStyle = '#f2f2ed';
-    ctx.strokeStyle = damaged ? '#ff5a5a' : '#ececea';
-    ctx.lineWidth = 2;
+    ctx.fillStyle = damaged ? '#c83f3f' : '#161616';
+    ctx.strokeStyle = '#161616';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    for (let index = 0; index < 8; index += 1) {
-      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 8;
+    for (let index = 0; index < 4; index += 1) {
+      const angle = -Math.PI / 4 + (Math.PI * 2 * index) / 4;
       const px = x + Math.cos(angle) * radius;
       const py = y + Math.sin(angle) * radius;
       if (index === 0) {
@@ -72,15 +69,15 @@ function drawPlayer(ctx, state, playerImage, now) {
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = damaged ? '#ff5a5a' : '#171717';
+    ctx.fillStyle = '#f5f1e8';
     ctx.beginPath();
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = damaged ? '#ff5a5a' : '#171717';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#f5f1e8';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x - 12, y + 12);
-    ctx.lineTo(x + 12, y + 12);
+    ctx.moveTo(x - 10, y + 12);
+    ctx.lineTo(x + 10, y + 12);
     ctx.stroke();
   }
 
@@ -90,16 +87,16 @@ function drawPlayer(ctx, state, playerImage, now) {
 
 function drawHearts(ctx, x, y, lives, totalLives) {
   ctx.save();
-  ctx.font = '700 20px ui-sans-serif, system-ui, sans-serif';
+  ctx.font = '650 17px "IBM Plex Mono", "SFMono-Regular", Consolas, monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   for (let index = 0; index < totalLives; index += 1) {
     const heartX = x + (index - 1) * 19;
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#f5f1e8';
     ctx.strokeText('♥', heartX, y);
-    ctx.fillStyle = index < lives ? '#5bb2ff' : '#f1f1f1';
+    ctx.fillStyle = index < lives ? '#161616' : '#a49c91';
     ctx.fillText('♥', heartX, y);
   }
 
@@ -116,27 +113,27 @@ function drawEnemyWord(ctx, enemy, isTarget, now) {
   ctx.translate(enemy.x, enemy.y);
   ctx.rotate(enemy.rotation || 0);
   ctx.globalAlpha = alpha;
-  ctx.font = `760 ${enemy.fontSize}px ui-sans-serif, system-ui, sans-serif`;
+  ctx.font = `650 ${enemy.fontSize}px "IBM Plex Mono", "SFMono-Regular", Consolas, monospace`;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = isWrong ? '#ff5a5a' : 'rgba(0, 0, 0, 0.78)';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = isWrong ? '#c83f3f' : '#f5f1e8';
 
   const typedWidth = ctx.measureText(typed).width;
   const remainingWidth = ctx.measureText(remaining).width;
   const startX = -(typedWidth + remainingWidth) / 2;
 
   ctx.strokeText(typed, startX, 0);
-  ctx.fillStyle = '#66d98f';
+  ctx.fillStyle = '#11783f';
   ctx.fillText(typed, startX, 0);
 
   ctx.strokeText(remaining, startX + typedWidth, 0);
-  ctx.fillStyle = isWrong ? '#ff7474' : isTarget ? '#ffffff' : 'rgba(255, 255, 255, 0.82)';
+  ctx.fillStyle = isWrong ? '#c83f3f' : isTarget ? '#161616' : 'rgba(22, 22, 22, 0.62)';
   ctx.fillText(remaining, startX + typedWidth, 0);
 
-  ctx.font = '760 12px ui-sans-serif, system-ui, sans-serif';
+  ctx.font = '650 11px "IBM Plex Mono", "SFMono-Regular", Consolas, monospace';
   ctx.textAlign = 'center';
-  ctx.fillStyle = isTarget ? '#ffffff' : 'rgba(244, 244, 244, 0.72)';
+  ctx.fillStyle = isTarget ? '#161616' : 'rgba(22, 22, 22, 0.48)';
   ctx.strokeText(String(enemy.spawnOrder), 0, enemy.fontSize + 12);
   ctx.fillText(String(enemy.spawnOrder), 0, enemy.fontSize + 12);
   ctx.restore();
@@ -153,8 +150,8 @@ function drawEffects(ctx, state, now, images) {
     if (image) {
       ctx.drawImage(image, effect.x - radius, effect.y - radius, radius * 2, radius * 2);
     } else {
-      ctx.strokeStyle = effect.type === 'destroy' ? '#69d68f' : '#ff4f4f';
-      ctx.lineWidth = effect.type === 'destroy' ? 3 : 5;
+      ctx.strokeStyle = effect.type === 'destroy' ? '#11783f' : '#c83f3f';
+      ctx.lineWidth = effect.type === 'destroy' ? 2 : 3;
       ctx.beginPath();
       ctx.arc(effect.x, effect.y, radius, 0, Math.PI * 2);
       ctx.stroke();
