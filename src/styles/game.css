@@ -82,17 +82,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(36px, 8vw, 96px);
-  width: min(960px, 100%);
+  gap: clamp(28px, 6vw, 72px);
+  width: min(1120px, 100%);
 }
 
 .level-track {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
   justify-content: center;
-  gap: clamp(28px, 6vw, 68px);
+  gap: clamp(18px, 4vw, 52px);
+  flex: 0 1 auto;
 }
 
 .level-track::before {
@@ -397,6 +398,7 @@
   }
 
   .level-track {
+    flex-wrap: wrap;
     max-width: 260px;
     gap: 18px 12px;
   }
