@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { buildDictionary } from './words.js';
 
 describe('level dictionaries', () => {
-  it('builds thematic hostile word dictionaries for five levels', () => {
-    expect(buildDictionary(1)).toContain('sem tab');
-    expect(buildDictionary(2)).toContain('sem copilot');
-    expect(buildDictionary(3)).toContain('tab falhou');
-    expect(buildDictionary(4)).toContain('sem agente');
-    expect(buildDictionary(5)).toContain('ci vermelho');
+  it('builds offensive word dictionaries for five levels', () => {
+    expect(buildDictionary(1)).toContain('idiota');
+    expect(buildDictionary(2)).toContain('imbecil');
+    expect(buildDictionary(3)).toContain('vadia');
+    expect(buildDictionary(4)).toContain('voce falha');
+    expect(buildDictionary(5)).toContain('filho da puta');
   });
 
-  it('includes balanced short phrases about coding without agentic tools', () => {
+  it('includes short offensive phrases to cut before impact', () => {
     const dictionary = buildDictionary(5);
     const phrases = dictionary.filter((word) => word.includes(' '));
 
