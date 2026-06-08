@@ -89,7 +89,9 @@
 .level-track {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
+  justify-content: center;
   gap: clamp(28px, 6vw, 68px);
 }
 
@@ -395,11 +397,11 @@
   }
 
   .level-track {
-    gap: 16px;
+    max-width: 260px;
+    gap: 18px 12px;
   }
 
   .level-track::before {
-    left: 32px;
-    right: 32px;
+    display: none;
   }
 }

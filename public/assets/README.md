@@ -10,12 +10,16 @@ Coloque os arquivos opcionais nestes caminhos. Se algum arquivo estiver ausente,
 - `sprites/background-level-1.png`
 - `sprites/background-level-2.png`
 - `sprites/background-level-3.png`
+- `sprites/background-level-4.png`
+- `sprites/background-level-5.png`
 
 ## Music
 
 - `music/level-1.mp3`
 - `music/level-2.mp3`
 - `music/level-3.mp3`
+- `music/level-4.mp3`
+- `music/level-5.mp3`
 - `music/victory.mp3`
 - `music/defeat.mp3`
 

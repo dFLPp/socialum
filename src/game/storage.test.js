@@ -26,9 +26,9 @@ describe('progress storage', () => {
 
   it('counts how many times the final level was cleared', () => {
     const storage = createStorage();
-    const progress = completeLevel({ completedLevels: [1, 2], nextLevel: 3, timesCleared: 0 }, 3, storage);
+    const progress = completeLevel({ completedLevels: [1, 2, 3, 4], nextLevel: 5, timesCleared: 0 }, 5, storage);
 
-    expect(progress.completedLevels).toEqual([1, 2, 3]);
+    expect(progress.completedLevels).toEqual([1, 2, 3, 4, 5]);
     expect(progress.timesCleared).toBe(1);
   });
 
