@@ -1,4 +1,4 @@
-const CACHE_NAME = 'word-siege-cache-v1';
+const CACHE_NAME = 'socialum-cache-v1';
 const PRECACHE_URLS = [];
 
 const shellUrls = [
