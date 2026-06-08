@@ -77,6 +77,8 @@ export function createWordEnemy({ level, text, spawnOrder, arena, now = 0, rng =
   const point = getSpawnPoint(arena, radialAngle);
   const speed = getWordSpeed(text, level.baseSpeed);
   const complexity = getWordComplexity(text);
+  const fontScale = level.wordFontScale || 1;
+  const fontSize = Math.max(20, Math.round((26 + complexity * 2) * fontScale));
   const travelAngle = radialAngle + Math.PI;
   const tiltDirection = rng() < 0.5 ? -1 : 1;
   const rotationTilt = tiltDirection * (0.28 + rng() * 0.22);
@@ -92,9 +94,9 @@ export function createWordEnemy({ level, text, spawnOrder, arena, now = 0, rng =
     rotation: normalizeReadableRotation(travelAngle + rotationTilt),
     speed,
     damage: level.damagePerWord + (complexity === 2 && level.id === 3 ? 1 : 0),
-    fontSize: 26 + complexity * 2,
+    fontSize,
     fontFamily: chooseWordFontFamily(rng),
-    radius: 24 + text.length * 4.8,
+    radius: Math.max(20, (24 + text.length * 4.8) * fontScale),
     status: 'alive',
     enteredViewport: false,
     createdAt: now,

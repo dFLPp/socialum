@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ASSETS } from './assets.js';
 import { advanceFrame, buildRunSummary, createCompletionEffect, createInitialRuntimeState, resizeRuntimeState } from './gameLoop.js';
 import { getActiveTarget, processTypedCharacter } from './input.js';
+import { splitMobilePromptText, tuneLevelForArena } from './mobile.js';
 import { drawGame } from './renderer.js';
 import { applyMistake, applyWordDestroyed } from './scoring.js';
 import { useImage } from './useImage.js';
@@ -45,11 +46,11 @@ function promptsAreEqual(left, right) {
 
 export function GameCanvas({ level, audioManager, onExit, onFinish }) {
   const canvasRef = useRef(null);
-  const inputRef = useRef(null);
   const stateRef = useRef(null);
   const frameRef = useRef(0);
   const finishRef = useRef(false);
   const onFinishRef = useRef(onFinish);
+  const playableLevelRef = useRef(level);
   const imagesRef = useRef({});
   const typeCharacterRef = useRef(() => {});
   const mobilePromptRef = useRef({ typed: '', remaining: '', message: 'Prepare-se' });
@@ -80,10 +81,10 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
     finishRef.current = false;
 
     const synced = syncCanvasSize(canvas);
-    stateRef.current = createInitialRuntimeState(level, synced.arena, lastFrameAt);
+    playableLevelRef.current = tuneLevelForArena(level, synced.arena);
+    stateRef.current = createInitialRuntimeState(playableLevelRef.current, synced.arena, lastFrameAt);
     mobilePromptRef.current = getMobilePrompt(stateRef.current);
     setMobilePrompt(mobilePromptRef.current);
-    inputRef.current?.focus();
     audioManager.playMusic(level.musicSrc);
 
     function syncMobilePrompt() {
@@ -135,9 +136,6 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
       }
 
       stateRef.current = nextState;
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
       syncMobilePrompt();
       return true;
     };
@@ -164,11 +162,12 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
       }
 
       const { ctx, arena } = syncCanvasSize(canvas);
+      playableLevelRef.current = tuneLevelForArena(level, arena);
       let runtimeState = resizeRuntimeState(stateRef.current, arena);
       const deltaMs = Math.min(60, now - lastFrameAt);
       lastFrameAt = now;
 
-      const advanced = advanceFrame(runtimeState, level, deltaMs, now);
+      const advanced = advanceFrame(runtimeState, playableLevelRef.current, deltaMs, now);
       runtimeState = advanced.state;
 
       for (const event of advanced.events) {
@@ -225,24 +224,24 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
           ref={canvasRef}
           className="game-canvas"
           aria-label="Área do jogo. Digite a palavra destacada antes dela chegar ao centro."
-          onClick={() => inputRef.current?.focus()}
-        />
-        <input
-          ref={inputRef}
-          className="typing-proxy"
-          aria-label="Campo de digitação do jogo"
-          autoCapitalize="none"
-          autoComplete="off"
-          spellCheck="false"
-          onChange={(event) => {
-            event.currentTarget.value = '';
-          }}
         />
       </div>
       <div className="mobile-typing-panel" aria-label="Teclado do jogo para celular">
         <p className="mobile-typing-status">{mobilePrompt.message}</p>
         <p className="mobile-active-word" aria-live="polite">
-          <span>{mobilePrompt.typed}</span>{mobilePrompt.remaining || 'aguarde'}
+          {splitMobilePromptText(mobilePrompt.typed).map((part, index) => (
+            <span
+              className={part.isSpace ? 'mobile-space-marker typed' : 'typed'}
+              key={`typed-${part.text}-${index}`}
+            >
+              {part.text}
+            </span>
+          ))}
+          {(mobilePrompt.remaining ? splitMobilePromptText(mobilePrompt.remaining) : [{ text: 'aguarde', isSpace: false }]).map((part, index) => (
+            <span className={part.isSpace ? 'mobile-space-marker' : undefined} key={`${part.text}-${index}`}>
+              {part.text}
+            </span>
+          ))}
         </p>
         <div className="mobile-keyboard" aria-label="Letras">
           {MOBILE_KEYS.map((row) => (
