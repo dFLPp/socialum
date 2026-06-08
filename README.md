@@ -1,44 +1,50 @@
 # Socialum
 
-Socialum is a minimalist typing-survival game built with React, Vite, and canvas rendering. Type each incoming word before it reaches the player, clear levels, and unlock the full run.
+Socialum e um jogo minimalista de digitacao e sobrevivencia feito com React, Vite e canvas. O tema atual brinca com a pergunta: depois de usar Copilot, Cursor e agentes o dia inteiro, voce ainda consegue digitar codigo em velocidade?
 
-## Quick Start
+## Inicio Rapido
 
 ```bash
 npm install
 npm run dev
 ```
 
-The dev server runs with Vite and is configured to listen on `0.0.0.0`.
+O servidor de desenvolvimento usa Vite e esta configurado para escutar em `0.0.0.0`.
 
-## Commands
+## Comandos
 
-| Command | Description |
+| Comando | Descricao |
 | --- | --- |
-| `npm run dev` | Start the local development server. |
-| `npm test` | Run the Vitest test suite. |
-| `npm run build` | Build the static production site into `dist/`. |
-| `npm run preview` | Preview the production build locally. |
+| `npm run dev` | Inicia o servidor local de desenvolvimento. |
+| `npm test` | Executa a suite de testes com Vitest. |
+| `npm run build` | Gera a versao estatica de producao em `dist/`. |
+| `npm run preview` | Abre uma previa local da build de producao. |
 
-## Project Structure
+## Tema do Jogo
 
-| Path | Purpose |
+As palavras e frases representam pequenas provocacoes sobre dependencia de ferramentas agenticas: `sem copilot`, `tab falhou`, `prompt ruim`, `ci vermelho`, `merge quebra` e outras pressoes comuns de desenvolvimento. O objetivo e digitar cada termo para apaga-lo antes que ele encoste no personagem.
+
+As fases aumentam a pressao aos poucos, mas as frases foram mantidas curtas para preservar o equilibrio do jogo.
+
+## Estrutura
+
+| Caminho | Finalidade |
 | --- | --- |
-| `src/game/` | Game loop, spawning, scoring, input, audio, canvas rendering, and tests. |
-| `src/screens/` | React screens for start, how-to, level select, results, and victory. |
-| `src/styles/` | Global UI styling and game screen styles. |
-| `public/assets/` | Optional game assets for sprites, fonts, music, and sound effects. |
-| `scripts/inject-sw-manifest.mjs` | Adds built asset URLs to the service worker cache manifest after `vite build`. |
+| `src/game/` | Loop do jogo, geracao de palavras, pontuacao, input, audio, renderizacao em canvas e testes. |
+| `src/screens/` | Telas React de inicio, como jogar, selecao de fase, resultado e vitoria. |
+| `src/styles/` | Estilos globais e estilos das telas do jogo. |
+| `public/assets/` | Assets opcionais para sprites, fontes, musicas e efeitos sonoros. |
+| `scripts/inject-sw-manifest.mjs` | Adiciona os arquivos gerados ao manifesto de cache do service worker depois do `vite build`. |
 
 ## Assets
 
-The game works without custom assets by using visual fallbacks and silent audio handling. Optional files can be placed under `public/assets/`; see `public/assets/README.md` for the expected paths.
+O jogo funciona sem assets personalizados, usando visuais de fallback e audio silencioso. Arquivos opcionais podem ser colocados em `public/assets/`; veja `public/assets/README.md` para os caminhos esperados.
 
 ## GitHub Pages
 
-This project builds to static HTML/CSS/JS in `dist/` and deploys through GitHub Actions. The workflow is defined in `.github/workflows/pages.yml`.
+O projeto gera HTML/CSS/JS estaticos em `dist/` e publica via GitHub Actions. O workflow fica em `.github/workflows/pages.yml`.
 
-To enable Pages for the repository, set the Pages source to **GitHub Actions** in GitHub repo settings, or run:
+Para habilitar o GitHub Pages no repositorio, configure a origem como **GitHub Actions** nas configuracoes do repositorio ou rode:
 
 ```bash
 gh api \
@@ -47,9 +53,9 @@ gh api \
   -f build_type=workflow
 ```
 
-After Pages is enabled, every push to `main` runs tests, builds the app, uploads `dist/`, and deploys the static site.
+Depois disso, todo push na branch `main` executa os testes, gera a build, envia `dist/` e publica o site estatico.
 
-## Notes
+## Observacoes
 
-- `dist/` is generated output and intentionally ignored by git.
-- Vite uses `base: './'` so built asset paths work from a GitHub Pages project URL such as `/socialum/`.
+- `dist/` e um resultado gerado e fica fora do git de proposito.
+- O Vite usa `base: './'` para que os caminhos dos assets funcionem em uma URL de projeto do GitHub Pages, como `/socialum/`.

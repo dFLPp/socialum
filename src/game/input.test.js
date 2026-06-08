@@ -30,6 +30,17 @@ describe('typing input', () => {
     expect(current[0].status).toBe('destroying');
   });
 
+  it('accepts spaces in short phrases', () => {
+    let current = [{ id: 'phrase', text: 'sem tab', typedCount: 0, spawnOrder: 1, status: 'alive' }];
+
+    for (const letter of 'sem tab') {
+      current = processTypedCharacter(current, letter, 100).enemies;
+    }
+
+    expect(current[0].typedCount).toBe(7);
+    expect(current[0].status).toBe('destroying');
+  });
+
   it('reports wrong letters without advancing progress', () => {
     const result = processTypedCharacter(enemies, 'x', 100);
 
