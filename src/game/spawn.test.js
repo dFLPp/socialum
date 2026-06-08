@@ -64,4 +64,24 @@ describe('word spawning', () => {
     expect(WORD_FONT_FAMILIES).toContain(secondEnemy.fontFamily);
     expect(firstEnemy.fontFamily).not.toBe(secondEnemy.fontFamily);
   });
+
+  it('supports smaller mobile word rendering', () => {
+    const desktopEnemy = createWordEnemy({
+      level,
+      text: 'idiota',
+      spawnOrder: 1,
+      arena,
+      rng: createRng([0, 0.5, 0.25, 0.25, 0]),
+    });
+    const mobileEnemy = createWordEnemy({
+      level: { ...level, wordFontScale: 0.78 },
+      text: 'idiota',
+      spawnOrder: 1,
+      arena,
+      rng: createRng([0, 0.5, 0.25, 0.25, 0]),
+    });
+
+    expect(mobileEnemy.fontSize).toBeLessThan(desktopEnemy.fontSize);
+    expect(mobileEnemy.radius).toBeLessThan(desktopEnemy.radius);
+  });
 });
