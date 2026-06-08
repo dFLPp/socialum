@@ -8,7 +8,7 @@ export function ResultScreen({ summary, onMenu, onRetry, onNext }) {
     <main className="menu-screen result-screen">
       <section className="result-stage" aria-label={won ? 'Resultado: ganhou' : 'Resultado: perdeu'}>
         <div className={`result-player${won ? ' won' : ' lost'}`}>
-          <div className="player-token" aria-label="Jogador">S</div>
+          <div className="player-token" role="img" aria-label="Jogador" />
           <div className="result-hearts" aria-label={`${summary.lives} vidas restantes`}>
             {hearts.map((filled, index) => (
               <span className={filled ? 'heart filled' : 'heart'} key={index}>♥</span>

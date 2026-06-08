@@ -5,6 +5,13 @@ const EASY_SPAWN_ARCS = [
   [Math.PI * 0.18, Math.PI * 0.36],
   [Math.PI * 1.64, Math.PI * 1.82],
 ];
+export const WORD_FONT_FAMILIES = [
+  '"IBM Plex Mono", "SFMono-Regular", Consolas, monospace',
+  'Georgia, "Times New Roman", serif',
+  '"Trebuchet MS", "Gill Sans", sans-serif',
+  '"Courier New", Courier, monospace',
+  'Verdana, Geneva, sans-serif',
+];
 
 export function getWordComplexity(word) {
   const length = word.length;
@@ -44,6 +51,11 @@ export function getWordSpeed(word, baseSpeed) {
   return Math.max(28, baseSpeed - complexity * 9 - Math.max(0, word.length - 10) * 0.8);
 }
 
+function chooseWordFontFamily(rng) {
+  const index = Math.floor(rng() * WORD_FONT_FAMILIES.length);
+  return WORD_FONT_FAMILIES[index] || WORD_FONT_FAMILIES[0];
+}
+
 function normalizeReadableRotation(angle) {
   let nextAngle = angle;
 
@@ -78,8 +90,9 @@ export function createWordEnemy({ level, text, spawnOrder, arena, now = 0, rng =
     rotation: normalizeReadableRotation(travelAngle + rotationTilt),
     speed,
     damage: level.damagePerWord + (complexity === 2 && level.id === 3 ? 1 : 0),
-    fontSize: 18 + complexity,
-    radius: 18 + text.length * 4,
+    fontSize: 26 + complexity * 2,
+    fontFamily: chooseWordFontFamily(rng),
+    radius: 24 + text.length * 4.8,
     status: 'alive',
     enteredViewport: false,
     createdAt: now,

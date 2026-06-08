@@ -1,6 +1,16 @@
 import { EFFECT_LIFETIME_MS, PLAYER_RADIUS } from './gameLoop.js';
 import { getActiveTarget } from './input.js';
 
+const CANVAS_COLORS = {
+  paper: '#050505',
+  grid: '#1f1f1f',
+  ink: '#f4efe2',
+  muted: 'rgba(244, 239, 226, 0.58)',
+  typed: '#8be7a7',
+  red: '#ff706b',
+  playerFace: '#050505',
+};
+
 function drawCoverImage(ctx, image, width, height) {
   const imageRatio = image.width / image.height;
   const canvasRatio = width / height;
@@ -21,12 +31,12 @@ function drawCoverImage(ctx, image, width, height) {
 }
 
 function drawFallbackBackground(ctx, level, width, height) {
-  ctx.fillStyle = '#f5f1e8';
+  ctx.fillStyle = CANVAS_COLORS.paper;
   ctx.fillRect(0, 0, width, height);
 
   ctx.save();
-  ctx.globalAlpha = 0.24;
-  ctx.strokeStyle = '#d9d1c2';
+  ctx.globalAlpha = level.id === 3 ? 0.5 : 0.34;
+  ctx.strokeStyle = CANVAS_COLORS.grid;
   ctx.lineWidth = 1;
   for (let y = 64 + level.id * 8; y < height; y += 128) {
     ctx.beginPath();
@@ -45,39 +55,30 @@ function drawPlayer(ctx, state, playerImage, now) {
   );
 
   ctx.save();
-  ctx.shadowColor = damaged ? 'rgba(200, 63, 63, 0.22)' : 'transparent';
-  ctx.shadowBlur = damaged ? 20 : 0;
+  ctx.shadowColor = damaged ? 'rgba(255, 112, 107, 0.34)' : 'transparent';
+  ctx.shadowBlur = damaged ? 18 : 0;
 
   if (playerImage) {
     ctx.drawImage(playerImage, x - radius, y - radius, radius * 2, radius * 2);
   } else {
-    ctx.fillStyle = damaged ? '#c83f3f' : '#161616';
-    ctx.strokeStyle = '#161616';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (let index = 0; index < 4; index += 1) {
-      const angle = -Math.PI / 4 + (Math.PI * 2 * index) / 4;
-      const px = x + Math.cos(angle) * radius;
-      const py = y + Math.sin(angle) * radius;
-      if (index === 0) {
-        ctx.moveTo(px, py);
-      } else {
-        ctx.lineTo(px, py);
-      }
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    const size = radius * 2;
+    ctx.fillStyle = damaged ? CANVAS_COLORS.red : CANVAS_COLORS.ink;
+    ctx.fillRect(x - radius, y - radius, size, size);
 
-    ctx.fillStyle = '#f5f1e8';
+    ctx.strokeStyle = damaged ? CANVAS_COLORS.red : CANVAS_COLORS.ink;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x - radius - 0.5, y - radius - 0.5, size + 1, size + 1);
+
+    ctx.fillStyle = CANVAS_COLORS.playerFace;
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.arc(x, y - 7, 5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#f5f1e8';
-    ctx.lineWidth = 1.5;
+
+    ctx.strokeStyle = CANVAS_COLORS.playerFace;
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(x - 10, y + 12);
-    ctx.lineTo(x + 10, y + 12);
+    ctx.moveTo(x - 12, y + 14);
+    ctx.lineTo(x + 12, y + 14);
     ctx.stroke();
   }
 
@@ -94,9 +95,9 @@ function drawHearts(ctx, x, y, lives, totalLives) {
   for (let index = 0; index < totalLives; index += 1) {
     const heartX = x + (index - 1) * 19;
     ctx.lineWidth = 2;
-    ctx.strokeStyle = '#f5f1e8';
+    ctx.strokeStyle = CANVAS_COLORS.paper;
     ctx.strokeText('♥', heartX, y);
-    ctx.fillStyle = index < lives ? '#161616' : '#a49c91';
+    ctx.fillStyle = index < lives ? CANVAS_COLORS.ink : 'rgba(244, 239, 226, 0.35)';
     ctx.fillText('♥', heartX, y);
   }
 
@@ -113,27 +114,28 @@ function drawEnemyWord(ctx, enemy, isTarget, now) {
   ctx.translate(enemy.x, enemy.y);
   ctx.rotate(enemy.rotation || 0);
   ctx.globalAlpha = alpha;
-  ctx.font = `650 ${enemy.fontSize}px "IBM Plex Mono", "SFMono-Regular", Consolas, monospace`;
+  const fontFamily = enemy.fontFamily || '"IBM Plex Mono", "SFMono-Regular", Consolas, monospace';
+  ctx.font = `650 ${enemy.fontSize}px ${fontFamily}`;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   ctx.lineWidth = 3;
-  ctx.strokeStyle = isWrong ? '#c83f3f' : '#f5f1e8';
+  ctx.strokeStyle = CANVAS_COLORS.paper;
 
   const typedWidth = ctx.measureText(typed).width;
   const remainingWidth = ctx.measureText(remaining).width;
   const startX = -(typedWidth + remainingWidth) / 2;
 
   ctx.strokeText(typed, startX, 0);
-  ctx.fillStyle = '#11783f';
+  ctx.fillStyle = CANVAS_COLORS.typed;
   ctx.fillText(typed, startX, 0);
 
   ctx.strokeText(remaining, startX + typedWidth, 0);
-  ctx.fillStyle = isWrong ? '#c83f3f' : isTarget ? '#161616' : 'rgba(22, 22, 22, 0.62)';
+  ctx.fillStyle = isWrong ? CANVAS_COLORS.red : isTarget ? CANVAS_COLORS.ink : CANVAS_COLORS.muted;
   ctx.fillText(remaining, startX + typedWidth, 0);
 
   ctx.font = '650 11px "IBM Plex Mono", "SFMono-Regular", Consolas, monospace';
   ctx.textAlign = 'center';
-  ctx.fillStyle = isTarget ? '#161616' : 'rgba(22, 22, 22, 0.48)';
+  ctx.fillStyle = isTarget ? CANVAS_COLORS.ink : 'rgba(244, 239, 226, 0.38)';
   ctx.strokeText(String(enemy.spawnOrder), 0, enemy.fontSize + 12);
   ctx.fillText(String(enemy.spawnOrder), 0, enemy.fontSize + 12);
   ctx.restore();
@@ -150,7 +152,7 @@ function drawEffects(ctx, state, now, images) {
     if (image) {
       ctx.drawImage(image, effect.x - radius, effect.y - radius, radius * 2, radius * 2);
     } else {
-      ctx.strokeStyle = effect.type === 'destroy' ? '#11783f' : '#c83f3f';
+      ctx.strokeStyle = effect.type === 'destroy' ? CANVAS_COLORS.typed : CANVAS_COLORS.red;
       ctx.lineWidth = effect.type === 'destroy' ? 2 : 3;
       ctx.beginPath();
       ctx.arc(effect.x, effect.y, radius, 0, Math.PI * 2);

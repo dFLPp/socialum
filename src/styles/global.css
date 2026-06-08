@@ -1,23 +1,24 @@
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", ui-monospace, monospace;
   line-height: 1.45;
-  color: #161616;
-  background: #f5f1e8;
+  color: #f4efe2;
+  background: #050505;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --paper: #f5f1e8;
-  --panel: rgba(255, 252, 244, 0.92);
-  --panel-strong: #fffdf6;
-  --ink: #161616;
-  --muted: #6b665c;
-  --quiet: #a49c91;
-  --line: rgba(22, 22, 22, 0.16);
-  --line-strong: #161616;
-  --blue: #174fff;
-  --green: #11783f;
-  --red: #c83f3f;
+  --paper: #050505;
+  --panel: rgba(18, 18, 18, 0.96);
+  --panel-strong: #101010;
+  --ink: #f4efe2;
+  --muted: #aaa39a;
+  --quiet: #625f59;
+  --line: rgba(244, 239, 226, 0.16);
+  --line-strong: #f4efe2;
+  --blue: #80b7ff;
+  --green: #8be7a7;
+  --red: #ff706b;
+  --avatar-face: #050505;
   --shadow: none;
 }
 
