@@ -1,0 +1,93 @@
+export const WORD_SETS = {
+  easy: [
+    'casa',
+    'sol',
+    'rio',
+    'lua',
+    'bola',
+    'porta',
+    'pato',
+    'livro',
+    'vento',
+    'fogo',
+    'terra',
+    'nuvem',
+    'flor',
+    'mapa',
+    'janela',
+    'banana',
+    'abacaxi',
+    'gato',
+    'verde',
+  ],
+  medium: [
+    'cozinha',
+    'mercado',
+    'viagem',
+    'telefone',
+    'caderno',
+    'planeta',
+    'castelo',
+    'montanha',
+    'corrida',
+    'relampago',
+    'teclado',
+    'girassol',
+    'oceano',
+    'ponteiro',
+    'foguete',
+    'caverna',
+    'bateria',
+    'festival',
+    'lanterna',
+    'passagem',
+    'biblioteca',
+    'tempestade',
+    'melodia',
+    'circuito',
+  ],
+  hard: [
+    'arquitetura',
+    'constelacao',
+    'sincronizado',
+    'extraordinario',
+    'criptografia',
+    'hipermercado',
+    'nebulosidade',
+    'contraditorio',
+    'imprevisivel',
+    'consequencia',
+    'responsabilidade',
+    'desenvolvimento',
+    'microprocessador',
+    'transbordamento',
+    'vulnerabilidade',
+    'interplanetario',
+    'radiofrequencia',
+    'incompatibilidade',
+    'paralelepipedo',
+    'eletromagnetico',
+    'desproporcional',
+    'indestrutivel',
+    'sobrecarregado',
+    'multiplicidade',
+    'transparencia',
+    'metamorfose',
+    'descentralizado',
+    'circunferencia',
+    'inconstitucional',
+    'reconfiguracao',
+  ],
+};
+
+export function buildDictionary(levelId) {
+  if (levelId === 1) {
+    return WORD_SETS.easy;
+  }
+
+  if (levelId === 2) {
+    return [...WORD_SETS.easy, ...WORD_SETS.medium];
+  }
+
+  return [...WORD_SETS.medium, ...WORD_SETS.hard];
+}
