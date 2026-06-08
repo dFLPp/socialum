@@ -256,6 +256,10 @@
   pointer-events: none;
 }
 
+.mobile-typing-panel {
+  display: none;
+}
+
 .result-stage {
   display: grid;
   grid-template-columns: minmax(120px, 1fr) 240px;
@@ -370,6 +374,106 @@
 }
 
 @media (max-width: 720px) {
+  .game-screen,
+  .gameplay-layout {
+    height: 100svh;
+    min-height: 100svh;
+  }
+
+  .gameplay-layout {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .canvas-wrap,
+  .game-canvas {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .mobile-typing-panel {
+    display: grid;
+    gap: 8px;
+    padding: 10px max(10px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right));
+    border-top: 1px solid var(--line-strong);
+    background: var(--panel-strong);
+  }
+
+  .mobile-typing-status,
+  .mobile-active-word {
+    margin: 0;
+    text-align: center;
+  }
+
+  .mobile-typing-status {
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .mobile-active-word {
+    color: var(--ink);
+    font-size: clamp(0.92rem, 4.4vw, 1.15rem);
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    min-height: 1.25em;
+  }
+
+  .mobile-active-word span {
+    color: var(--green);
+  }
+
+  .mobile-keyboard {
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+    touch-action: manipulation;
+    user-select: none;
+  }
+
+  .mobile-key-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .mobile-key {
+    display: grid;
+    min-width: 0;
+    width: min(8.8vw, 36px);
+    height: 34px;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    color: var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 650;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .mobile-key:active {
+    color: var(--paper);
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .mobile-space-key {
+    width: min(48vw, 220px);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
   .level-select-layout {
     flex-direction: column;
     justify-items: center;

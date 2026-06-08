@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ASSETS } from './assets.js';
 import { advanceFrame, buildRunSummary, createCompletionEffect, createInitialRuntimeState, resizeRuntimeState } from './gameLoop.js';
-import { processTypedCharacter } from './input.js';
+import { getActiveTarget, processTypedCharacter } from './input.js';
 import { drawGame } from './renderer.js';
 import { applyMistake, applyWordDestroyed } from './scoring.js';
 import { useImage } from './useImage.js';
@@ -24,6 +24,25 @@ function syncCanvasSize(canvas) {
   return { ctx, arena: { width, height } };
 }
 
+const MOBILE_KEYS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+
+function getMobilePrompt(state) {
+  const target = state ? getActiveTarget(state.enemies) : null;
+  if (!target) {
+    return { typed: '', remaining: '', message: state?.message || 'Prepare-se' };
+  }
+
+  return {
+    typed: target.text.slice(0, target.typedCount),
+    remaining: target.text.slice(target.typedCount),
+    message: state.message || 'Digite a palavra ativa',
+  };
+}
+
+function promptsAreEqual(left, right) {
+  return left.typed === right.typed && left.remaining === right.remaining && left.message === right.message;
+}
+
 export function GameCanvas({ level, audioManager, onExit, onFinish }) {
   const canvasRef = useRef(null);
   const inputRef = useRef(null);
@@ -32,6 +51,9 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
   const finishRef = useRef(false);
   const onFinishRef = useRef(onFinish);
   const imagesRef = useRef({});
+  const typeCharacterRef = useRef(() => {});
+  const mobilePromptRef = useRef({ typed: '', remaining: '', message: 'Prepare-se' });
+  const [mobilePrompt, setMobilePrompt] = useState(mobilePromptRef.current);
 
   const background = useImage(level.backgroundSrc);
   const player = useImage(ASSETS.sprites.player);
@@ -59,27 +81,26 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
 
     const synced = syncCanvasSize(canvas);
     stateRef.current = createInitialRuntimeState(level, synced.arena, lastFrameAt);
+    mobilePromptRef.current = getMobilePrompt(stateRef.current);
+    setMobilePrompt(mobilePromptRef.current);
     inputRef.current?.focus();
     audioManager.playMusic(level.musicSrc);
 
-    function handleKeyDown(event) {
-      if (!active || event.repeat || !stateRef.current || stateRef.current.outcome !== 'playing') {
-        return;
+    function syncMobilePrompt() {
+      const nextPrompt = getMobilePrompt(stateRef.current);
+      if (!promptsAreEqual(nextPrompt, mobilePromptRef.current)) {
+        mobilePromptRef.current = nextPrompt;
+        setMobilePrompt(nextPrompt);
+      }
+    }
+
+    typeCharacterRef.current = (key) => {
+      if (!active || !stateRef.current || stateRef.current.outcome !== 'playing' || key.length !== 1) {
+        return false;
       }
 
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onExit();
-        return;
-      }
-
-      if (event.key.length !== 1) {
-        return;
-      }
-
-      event.preventDefault();
       const now = performance.now();
-      const result = processTypedCharacter(stateRef.current.enemies, event.key, now);
+      const result = processTypedCharacter(stateRef.current.enemies, key, now);
       let nextState = { ...stateRef.current, enemies: result.enemies };
 
       if (result.event.type === 'wrong-letter') {
@@ -114,7 +135,27 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
       }
 
       stateRef.current = nextState;
-      inputRef.current.value = '';
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+      syncMobilePrompt();
+      return true;
+    };
+
+    function handleKeyDown(event) {
+      if (!active || event.repeat || !stateRef.current || stateRef.current.outcome !== 'playing') {
+        return;
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onExit();
+        return;
+      }
+
+      if (typeCharacterRef.current(event.key)) {
+        event.preventDefault();
+      }
     }
 
     function frame(now) {
@@ -142,6 +183,7 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
       }
 
       stateRef.current = runtimeState;
+      syncMobilePrompt();
       drawGame(ctx, runtimeState, level, imagesRef.current, now);
 
       if (runtimeState.outcome !== 'playing' && !finishRef.current) {
@@ -168,8 +210,13 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
       window.clearTimeout(finishTimeoutId);
       window.removeEventListener('keydown', handleKeyDown);
       audioManager.stopMusic();
+      typeCharacterRef.current = () => {};
     };
   }, [audioManager, level, onExit]);
+
+  function handleMobileKey(key) {
+    typeCharacterRef.current(key);
+  }
 
   return (
     <div className="gameplay-layout">
@@ -191,6 +238,41 @@ export function GameCanvas({ level, audioManager, onExit, onFinish }) {
             event.currentTarget.value = '';
           }}
         />
+      </div>
+      <div className="mobile-typing-panel" aria-label="Teclado do jogo para celular">
+        <p className="mobile-typing-status">{mobilePrompt.message}</p>
+        <p className="mobile-active-word" aria-live="polite">
+          <span>{mobilePrompt.typed}</span>{mobilePrompt.remaining || 'aguarde'}
+        </p>
+        <div className="mobile-keyboard" aria-label="Letras">
+          {MOBILE_KEYS.map((row) => (
+            <div className="mobile-key-row" key={row}>
+              {[...row].map((key) => (
+                <button
+                  className="mobile-key"
+                  type="button"
+                  key={key}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    handleMobileKey(key);
+                  }}
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
+          ))}
+          <button
+            className="mobile-key mobile-space-key"
+            type="button"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              handleMobileKey(' ');
+            }}
+          >
+            espaço
+          </button>
+        </div>
       </div>
     </div>
   );
